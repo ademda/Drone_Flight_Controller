@@ -19,10 +19,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "FlightController.h"
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "mpu6050.h"
+#include "esc_pwm.h"
+#include "hmc5883l.h"
+#include "bmp280.h"
+#include "FlightController.h"
+#include "Receiver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +38,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 uint32_t ticks;
+uint32_t counter;
 extern MPU6050_Handle_t mpu;
 extern HMC5883L_Handle_t hmc;
 extern BMP280_Handle_t bmp;
@@ -251,7 +257,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance == TIM2 && drone.calib_state == CALIBRATED)
 	{
-		flight_controller_update(&drone);
+		// flight_controller_update(&drone);  // DISABLED FOR DEBUG - sensor data is read in main loop instead
 	}
 }
 
@@ -271,10 +277,12 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
 	}
 	else if (mpu.state == MPU6050_STATE_READING_DATA){
 		MPU6050_I2C_RxCpltCallback();
+		counter++;
 	}
 	else {
 		Error_Handler();
 	}
+	MPU6050_Start_Reading(&mpu);
 
 }
 
@@ -285,10 +293,10 @@ void MPU6050_I2C_RxCpltCallback()
 		// Parse received data
 		MPU6050_Parse_Data(&mpu);
 		mpu.state = MPU6050_STATE_READY;
-		if (ticks % 20 == 0){
+		if (ticks % 20 == 0 && hmc.state == HMC5883L_STATE_READY){
 			HMC5883L_Start_Reading(&hmc);
 		}
-		if (ticks % 10 == 0){
+		if (ticks % 10 == 0 && bmp.state == BMP280_STATE_READY){
 			BMP280_Start_Reading(&bmp);
 		}
 		else{

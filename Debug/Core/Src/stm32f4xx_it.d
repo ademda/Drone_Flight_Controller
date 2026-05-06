@@ -32,16 +32,16 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ ../Core/Inc/stm32f4xx_it.h \
+ C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/mpu6050.h \
+ C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/esc_pwm.h \
+ C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/hmc5883l.h \
+ C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/bmp280.h \
  ../Core/Inc/FlightController.h ../Core/Inc/Receiver.h \
  ../Core/Inc/utils.h \
  C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/sbus_rx.h \
- ../Core/Inc/State_Estimator.h \
- C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/bmp280.h \
- C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/mpu6050.h \
- C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/hmc5883l.h \
- ../Core/Inc/PIDController.h ../Core/Inc/Motor.h \
- C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/esc_pwm.h \
- ../Core/Inc/stm32f4xx_it.h
+ ../Core/Inc/State_Estimator.h ../Core/Inc/PIDController.h \
+ ../Core/Inc/Motor.h ../Core/Inc/Receiver.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -76,15 +76,16 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+../Core/Inc/stm32f4xx_it.h:
+C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/mpu6050.h:
+C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/esc_pwm.h:
+C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/hmc5883l.h:
+C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/bmp280.h:
 ../Core/Inc/FlightController.h:
 ../Core/Inc/Receiver.h:
 ../Core/Inc/utils.h:
 C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/sbus_rx.h:
 ../Core/Inc/State_Estimator.h:
-C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/bmp280.h:
-C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/mpu6050.h:
-C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/hmc5883l.h:
 ../Core/Inc/PIDController.h:
 ../Core/Inc/Motor.h:
-C:/Users/dalya/STM32CubeIDE/Project_ws/flight_controller_v3/app_drivers/Inc/esc_pwm.h:
-../Core/Inc/stm32f4xx_it.h:
+../Core/Inc/Receiver.h:

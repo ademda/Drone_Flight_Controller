@@ -31,6 +31,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//PA11 -> Forward Right
+//PA10 -> Backwards Left
+//PA9 -> FOWRAWD LEFT
+//PA8 -> Backward Right
+#define ALL_MOTORS (GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11)
 
 /* USER CODE END PD */
 
@@ -67,6 +72,44 @@ PID_Controller_t alt_pid;
 
 RC_Command_t rc_cmd;
 State_Estimator_t state;
+
+// Debug variables for sensor monitoring
+// MPU6050 (Accelerometer + Gyroscope)
+float debug_mpu_roll = 0.0f;
+float debug_mpu_pitch = 0.0f;
+float debug_mpu_accel_x = 0.0f;
+float debug_mpu_accel_y = 0.0f;
+float debug_mpu_accel_z = 0.0f;
+float debug_mpu_gyro_x = 0.0f;
+float debug_mpu_gyro_y = 0.0f;
+float debug_mpu_gyro_z = 0.0f;
+
+// HMC5883L (Magnetometer)
+float debug_mag_x = 0.0f;
+float debug_mag_y = 0.0f;
+float debug_mag_z = 0.0f;
+float debug_mag_yaw = 0.0f;
+float debug_mag_heading = 0.0f;
+
+// BMP280 (Barometer)
+float debug_bmp_temperature = 0.0f;
+float debug_bmp_pressure = 0.0f;
+float debug_bmp_altitude = 0.0f;
+
+// RC Command debug
+uint16_t debug_rc_throttle = 0;
+float debug_rc_roll = 0.0f;
+float debug_rc_pitch = 0.0f;
+float debug_rc_yaw = 0.0f;
+uint16_t debug_rc_arm_value = 0;
+
+// State Estimator debug
+float debug_state_roll = 0.0f;
+float debug_state_pitch = 0.0f;
+float debug_state_yaw = 0.0f;
+float debug_state_altitude = 0.0f;
+float debug_state_climb_rate = 0.0f;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,11 +117,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_TIM1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 HAL_StatusTypeDef flight_controller_init();
 
@@ -120,22 +163,37 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_TIM1_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   // Enable UART2 interrupt-based character reception for tuning commands
   HAL_UART_Receive_IT(&huart2, (uint8_t*)&huart2.pRxBuffPtr, 1);
   HAL_TIM_Base_Start_IT(&htim2);
-  //the calibraion of the mpu starts triggering the mpu reads;
-  // Start main control loop (100Hz)
-  if (flight_controller_init() != HAL_OK){
-	  Error_Handler();
-  }
+  flight_controller_init();
 
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 3273);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 3273);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 3273);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 3273);
+
+// HAL_Delay(2000);
+
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 6545);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 6545);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 6545);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 6545);
+
+// HAL_Delay(6000);
+
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 3273);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 3273);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 6545);
+// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 3273);
+// HAL_Delay(2000);
 
   /* USER CODE END 2 */
 
@@ -147,7 +205,42 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     
-    // Process PID tuning commands from UART
+    // Debug: Read and store sensor data in global variables
+    // MPU6050 data
+    debug_mpu_roll = mpu.roll;
+    debug_mpu_pitch = mpu.pitch;
+    debug_mpu_accel_x = mpu.accel_x;
+    debug_mpu_accel_y = mpu.accel_y;
+    debug_mpu_accel_z = mpu.accel_z;
+    debug_mpu_gyro_x = mpu.gyro_x;
+    debug_mpu_gyro_y = mpu.gyro_y;
+    debug_mpu_gyro_z = mpu.gyro_z;
+    
+    // HMC5883L data
+    debug_mag_x = hmc.mag_x;
+    debug_mag_y = hmc.mag_y;
+    debug_mag_z = hmc.mag_z;
+    debug_mag_yaw = hmc.yaw;
+    debug_mag_heading = hmc.heading;
+    
+    // BMP280 data
+    debug_bmp_temperature = bmp.temperature;
+    debug_bmp_pressure = bmp.pressure;
+    debug_bmp_altitude = bmp.altitude;
+    
+    // RC command data
+    debug_rc_throttle = rc_cmd.throttle;
+    debug_rc_roll = rc_cmd.roll;
+    debug_rc_pitch = rc_cmd.pitch;
+    debug_rc_yaw = rc_cmd.yaw;
+    debug_rc_arm_value = rc_cmd.arm_value;
+    
+    // State estimator data
+    debug_state_roll = state.roll;
+    debug_state_pitch = state.pitch;
+    debug_state_yaw = state.yaw;
+    debug_state_altitude = state.altitude;
+    debug_state_climb_rate = state.climb_rate;
     
     HAL_Delay(10);
 
@@ -177,9 +270,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 72;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -193,7 +286,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
@@ -222,7 +315,7 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -307,17 +400,13 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
+  htim1.Init.Prescaler = 21;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 65535;
+  htim1.Init.Period = 65453;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_OC_Init(&htim1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -346,8 +435,7 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  if (HAL_TIM_OC_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -526,13 +614,14 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 HAL_StatusTypeDef flight_controller_init(){
 	 /*************** SENSORS + ACTUATORS INIT *******************/
-    ibus_uart_init(&huart1);
+      ibus_uart_init(&huart1);
 	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
 	  MPU6050_Calibrate(&mpu, 1000);
-	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
-		  return HAL_ERROR;
-	  }
-	  BMP280_Init(&bmp, &hi2c1);
+	  MPU6050_Start_Reading(&mpu);
+//	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
+//		  return HAL_ERROR;
+//	  }
+	  //BMP280_Init(&bmp, &hi2c1);
 	  ESC_PWM_Init(&htim1);
 	  /*************************** CONTROL SYSTEM INIT *******************/
 	  pid_init(&roll_pid, &pitch_pid, &yaw_pid, &alt_pid);
@@ -550,7 +639,7 @@ HAL_StatusTypeDef flight_controller_init(){
 	  drone.rc_cmd = &rc_cmd;
 	  drone.state = &state;
 
-	  ESC_PWM_Calibrate (&htim1, 1000);
+	 // ESC_PWM_Calibrate (&htim1, 3000);
 
 	  drone.calib_state = CALIBRATED;
 	  return HAL_OK;

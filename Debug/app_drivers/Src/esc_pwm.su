@@ -1,5 +1,4 @@
-../app_drivers/Src/esc_pwm.c:21:6:ESC_PWM_Init	16	static
-../app_drivers/Src/esc_pwm.c:44:6:ESC_PWM_SetPulse_us	32	static
-../app_drivers/Src/esc_pwm.c:57:6:ESC_PWM_SetPulse	24	static
-../app_drivers/Src/esc_pwm.c:72:6:ESC_PWM_SetThrottle	24	static
-../app_drivers/Src/esc_pwm.c:88:6:ESC_PWM_Calibrate	24	static
+../app_drivers/Src/esc_pwm.c:22:6:ESC_PWM_Init	24	static
+../app_drivers/Src/esc_pwm.c:41:6:ESC_PWM_SetPulse	24	static
+../app_drivers/Src/esc_pwm.c:51:6:ESC_PWM_SetThrottle	24	static
+../app_drivers/Src/esc_pwm.c:67:6:ESC_PWM_Calibrate	24	static

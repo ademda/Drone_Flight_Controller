@@ -37,6 +37,7 @@ typedef enum {
 typedef struct {
 	I2C_HandleTypeDef *hi2c;
 	uint8_t i2c_addr;
+
 	MPU6050_State_t state;
 	
 	// Raw sensor data (from I2C)
@@ -64,9 +65,11 @@ typedef struct {
 
 // Function declarations
 void MPU6050_Init(MPU6050_Handle_t *handle, I2C_HandleTypeDef *hi2c, uint8_t i2c_addr);
+void MPU6050_WakeUp(MPU6050_Handle_t *handle);
+void MPU6050_Sleep(MPU6050_Handle_t *handle);
 void MPU6050_Start_Reading(MPU6050_Handle_t *handle);
 void MPU6050_Process(MPU6050_Handle_t *handle);
 void MPU6050_I2C_RxCpltCallback();
 void MPU6050_Calibrate(MPU6050_Handle_t *handle, uint16_t num_samples);
-
+void MPU6050_Parse_Data(MPU6050_Handle_t *handle);
 #endif /* INC_MPU6050_H_ */
