@@ -148,7 +148,7 @@ void MPU6050_Init(MPU6050_Handle_t *handle, I2C_HandleTypeDef *hi2c, uint8_t i2c
 	}
 	// Configure the sensor
 	MPU6050_Configure(handle);
-
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
 	handle->state = MPU6050_STATE_READY;
 }
 

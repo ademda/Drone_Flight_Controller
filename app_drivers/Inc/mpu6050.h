@@ -40,20 +40,20 @@ typedef struct {
 
 	MPU6050_State_t state;
 	
-	// Raw sensor data (from I2C)
-	int16_t accel_x_raw, accel_y_raw, accel_z_raw;
-	int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;
-	int16_t temp_raw;
+	// Scale factors (floats grouped together for alignment)
+	float accel_scale;  // from configuration
+	float gyro_scale;   // from configuration
 	
-	// Scaled sensor data
+	// Scaled sensor data (floats grouped together)
 	float accel_x, accel_y, accel_z;      // in g
 	float gyro_x, gyro_y, gyro_z;         // in deg/s
 	float temperature;                     // in °C
-	float roll, pitch, yaw;                     // in degrees (calculated from accel)
+	float roll, pitch, yaw;                // in degrees (calculated from accel)
 	
-	// Scale factors
-	float accel_scale;  // from configuration
-	float gyro_scale;   // from configuration
+	// Raw sensor data (int16_t grouped together)
+	int16_t accel_x_raw, accel_y_raw, accel_z_raw;
+	int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;
+	int16_t temp_raw;
 	
 	// Calibration offsets
 	int16_t accel_offset_x, accel_offset_y, accel_offset_z;

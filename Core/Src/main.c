@@ -171,27 +171,13 @@ int main(void)
   // Enable UART2 interrupt-based character reception for tuning commands
   HAL_UART_Receive_IT(&huart2, (uint8_t*)&huart2.pRxBuffPtr, 1);
   HAL_TIM_Base_Start_IT(&htim2);
+  
+  // Wait for button press to initialize flight controller
+  uint8_t button_pressed_prev = 0;
+  while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
+    HAL_Delay(10);
+  }
   flight_controller_init();
-
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 3273);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 3273);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 3273);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 3273);
-
-// HAL_Delay(2000);
-
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 6545);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 6545);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 6545);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 6545);
-
-// HAL_Delay(6000);
-
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH1, 3273);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH2, 3273);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH3, 6545);
-// ESC_PWM_SetPulse(&htim1, ESC_TIMER_CH4, 3273);
-// HAL_Delay(2000);
 
   /* USER CODE END 2 */
 
@@ -360,7 +346,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 50000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -595,8 +581,25 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB5 */
   GPIO_InitStruct.Pin = GPIO_PIN_5;
@@ -613,9 +616,9 @@ static void MX_GPIO_Init(void)
 HAL_StatusTypeDef flight_controller_init(){
 	 /*************** SENSORS + ACTUATORS INIT *******************/
       ibus_uart_init(&huart1);
-	  //MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
-	  //MPU6050_Calibrate(&mpu, 1000);
-	  //MPU6050_Start_Reading(&mpu);
+	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
+	  MPU6050_Calibrate(&mpu, 1000);
+	  MPU6050_Start_Reading(&mpu);
 //	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
 //		  return HAL_ERROR;
 //	  }
