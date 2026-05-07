@@ -2,7 +2,7 @@
 ../app_drivers/Src/mpu6050.c:86:6:MPU6050_WakeUp	32	static
 ../app_drivers/Src/mpu6050.c:99:6:MPU6050_Sleep	32	static
 ../app_drivers/Src/mpu6050.c:109:6:MPU6050_Init	48	static
-../app_drivers/Src/mpu6050.c:150:13:MPU6050_Configure	40	static
-../app_drivers/Src/mpu6050.c:166:6:MPU6050_Start_Reading	24	static
-../app_drivers/Src/mpu6050.c:176:6:MPU6050_Parse_Data	32	static
-../app_drivers/Src/mpu6050.c:207:6:MPU6050_Calibrate	64	static
+../app_drivers/Src/mpu6050.c:156:13:MPU6050_Configure	40	static
+../app_drivers/Src/mpu6050.c:172:6:MPU6050_Start_Reading	24	static
+../app_drivers/Src/mpu6050.c:182:6:MPU6050_Parse_Data	32	static
+../app_drivers/Src/mpu6050.c:225:6:MPU6050_Calibrate	64	static

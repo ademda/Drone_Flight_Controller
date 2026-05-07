@@ -12,7 +12,7 @@ extern uint8_t ibus_dma_buffer[IBUS_FRAME_LENGTH];
 
 void flight_controller_update(Drone_t* drone){
 	float roll_correction, pitch_correction, yaw_correction;
-	get_commands((uint16_t *)ibus_dma_buffer, drone->rc_cmd);
+	get_commands(drone->rc_cmd);
 
 	compute_current_state(drone->state, drone->mpu, drone->bmp, drone->hmc);
 

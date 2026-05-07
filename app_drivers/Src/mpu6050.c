@@ -124,6 +124,12 @@ void MPU6050_Init(MPU6050_Handle_t *handle, I2C_HandleTypeDef *hi2c, uint8_t i2c
 	handle->gyro_offset_y = 0;
 	handle->gyro_offset_z = 0;
 
+	// Initialize angles and time tracking for gyro integration
+	handle->roll = 0.0f;
+	handle->pitch = 0.0f;
+	handle->yaw = 0.0f;
+	handle->last_update_time = HAL_GetTick();
+
 	g_mpu6050_handle = handle;
 
 	// ---- THE FIX: recover bus before touching I2C ----------------------
@@ -198,9 +204,21 @@ void MPU6050_Parse_Data(MPU6050_Handle_t *handle)
 	// Temperature: 35°C = 0, +0.00294°C / LSB
 	handle->temperature = (handle->temp_raw / 340.0f) + 36.53f;
 
-	// Calculate roll and pitch from accelerometer (in degrees)
-	handle->roll = atan2f(handle->accel_y, handle->accel_z) * 180.0f / 3.14159265359f;
-	handle->pitch = atan2f(-handle->accel_x, sqrtf(handle->accel_y * handle->accel_y + handle->accel_z * handle->accel_z)) * 180.0f / 3.14159265359f;
+	// Calculate roll, pitch, and yaw from gyro data using integration
+	uint32_t current_time = HAL_GetTick();
+	float dt = (current_time - handle->last_update_time) / 1000.0f;  // Convert to seconds
+	
+	// Prevent dt from being too large (e.g., on first call)
+	if (dt > 0.1f)
+		dt = 0.01f;  // Default to 10ms if dt is unreasonable
+	
+	// Integrate gyro rates to get angles (degrees)
+	handle->roll += handle->gyro_x * dt;
+	handle->pitch += handle->gyro_y * dt;
+	handle->yaw += handle->gyro_z * dt;
+	
+	// Update the last update time
+	handle->last_update_time = current_time;
 }
 
 // Calibration function - collects samples to compute offset values

@@ -57,8 +57,6 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
-uint8_t uart_rx_buffer[1000];
-
 MPU6050_Handle_t mpu;
 HMC5883L_Handle_t hmc;
 BMP280_Handle_t bmp;
@@ -615,14 +613,14 @@ static void MX_GPIO_Init(void)
 HAL_StatusTypeDef flight_controller_init(){
 	 /*************** SENSORS + ACTUATORS INIT *******************/
       ibus_uart_init(&huart1);
-	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
-	  MPU6050_Calibrate(&mpu, 1000);
-	  MPU6050_Start_Reading(&mpu);
+	  //MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
+	  //MPU6050_Calibrate(&mpu, 1000);
+	  //MPU6050_Start_Reading(&mpu);
 //	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
 //		  return HAL_ERROR;
 //	  }
 	  //BMP280_Init(&bmp, &hi2c1);
-	  ESC_PWM_Init(&htim1);
+	  //ESC_PWM_Init(&htim1);
 	  /*************************** CONTROL SYSTEM INIT *******************/
 	  pid_init(&roll_pid, &pitch_pid, &yaw_pid, &alt_pid);
 	/********************** DRONE STRUCTURE INIT  ************************/

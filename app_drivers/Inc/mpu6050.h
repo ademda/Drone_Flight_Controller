@@ -59,6 +59,9 @@ typedef struct {
 	int16_t accel_offset_x, accel_offset_y, accel_offset_z;
 	int16_t gyro_offset_x, gyro_offset_y, gyro_offset_z;
 	
+	// Time tracking for gyro integration
+	uint32_t last_update_time;  // in milliseconds
+	
 	// I2C buffers
 	uint8_t rx_buff[14];
 } MPU6050_Handle_t;
