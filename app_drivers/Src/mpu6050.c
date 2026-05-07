@@ -11,7 +11,8 @@
 
 MPU6050_Handle_t *g_mpu6050_handle = NULL;
 extern I2C_HandleTypeDef hi2c1;
-
+float roll, pitch, yaw;
+uint8_t state2;
 // Forward declarations
 void MPU6050_Parse_Data(MPU6050_Handle_t *handle);
 static void MPU6050_Configure(MPU6050_Handle_t *handle);
@@ -143,7 +144,8 @@ void MPU6050_Init(MPU6050_Handle_t *handle, I2C_HandleTypeDef *hi2c, uint8_t i2c
 	HAL_I2C_Mem_Write(handle->hi2c,  handle->i2c_addr, 0x6B, 1, &data, 1, 100);
 
 	uint8_t check = 0;
-	if (HAL_I2C_Mem_Read(handle->hi2c, handle->i2c_addr, 0x75, 1, &check, 1, 100)){
+	state2 = HAL_I2C_Mem_Read(handle->hi2c, handle->i2c_addr, 0x75, 1, &check, 1, 100) ;
+	if (state2 != HAL_OK){
 		Error_Handler();
 	}
 	// Configure the sensor
@@ -197,9 +199,9 @@ void MPU6050_Parse_Data(MPU6050_Handle_t *handle)
 	handle->accel_y = (handle->accel_y_raw - handle->accel_offset_y) * handle->accel_scale;
 	handle->accel_z = (handle->accel_z_raw - handle->accel_offset_z) * handle->accel_scale;
 
-	handle->gyro_x = (handle->gyro_x_raw - handle->gyro_offset_x) * handle->gyro_scale;
-	handle->gyro_y = (handle->gyro_y_raw - handle->gyro_offset_y) * handle->gyro_scale;
-	handle->gyro_z = (handle->gyro_z_raw - handle->gyro_offset_z) * handle->gyro_scale;
+	handle->gyro_x = (handle->gyro_x_raw - handle->gyro_offset_x) / 131.0f;
+	handle->gyro_y = (handle->gyro_y_raw - handle->gyro_offset_y) / 131.0f;
+	handle->gyro_z = (handle->gyro_z_raw - handle->gyro_offset_z) / 131.0f;
 
 	// Temperature: 35°C = 0, +0.00294°C / LSB
 	handle->temperature = (handle->temp_raw / 340.0f) + 36.53f;
@@ -216,7 +218,7 @@ void MPU6050_Parse_Data(MPU6050_Handle_t *handle)
 	handle->roll += handle->gyro_x * dt;
 	handle->pitch += handle->gyro_y * dt;
 	handle->yaw += handle->gyro_z * dt;
-	
+
 	// Update the last update time
 	handle->last_update_time = current_time;
 }

@@ -35,11 +35,6 @@ typedef enum {
 } MPU6050_State_t;
 
 typedef struct {
-	I2C_HandleTypeDef *hi2c;
-	uint8_t i2c_addr;
-
-	MPU6050_State_t state;
-	
 	// Scale factors (floats grouped together for alignment)
 	float accel_scale;  // from configuration
 	float gyro_scale;   // from configuration
@@ -49,7 +44,11 @@ typedef struct {
 	float gyro_x, gyro_y, gyro_z;         // in deg/s
 	float temperature;                     // in °C
 	float roll, pitch, yaw;                // in degrees (calculated from accel)
-	
+
+	I2C_HandleTypeDef *hi2c;
+	uint8_t i2c_addr;
+
+	MPU6050_State_t state;
 	// Raw sensor data (int16_t grouped together)
 	int16_t accel_x_raw, accel_y_raw, accel_z_raw;
 	int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;

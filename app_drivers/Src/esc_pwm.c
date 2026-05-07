@@ -79,6 +79,6 @@ void ESC_PWM_Calibrate(TIM_HandleTypeDef *htim, uint32_t duration_ms)
 
 	// After calibration, ESCs should be ready to receive commands
 	// Set to neutral (1500us) before starting
-	ESC_PWM_SetThrottle(htim, 2000, 2000, 2000, 2000);
+	ESC_PWM_SetThrottle(htim, 1500, 1500, 1500, 1500);
 	HAL_Delay(500);
 }

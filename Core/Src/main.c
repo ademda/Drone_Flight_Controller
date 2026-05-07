@@ -53,7 +53,6 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
-UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
@@ -116,7 +115,6 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
@@ -162,14 +160,12 @@ int main(void)
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
-  MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   // Enable UART2 interrupt-based character reception for tuning commands
-  HAL_UART_Receive_IT(&huart2, (uint8_t*)&huart2.pRxBuffPtr, 1);
   HAL_TIM_Base_Start_IT(&htim2);
   
   // Wait for button press to initialize flight controller
@@ -520,39 +516,6 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -615,10 +578,10 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 HAL_StatusTypeDef flight_controller_init(){
 	 /*************** SENSORS + ACTUATORS INIT *******************/
-      ibus_uart_init(&huart1);
 	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
 	  MPU6050_Calibrate(&mpu, 1000);
 	  MPU6050_Start_Reading(&mpu);
+      //ibus_uart_init(&huart1);
 //	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
 //		  return HAL_ERROR;
 //	  }
@@ -640,7 +603,7 @@ HAL_StatusTypeDef flight_controller_init(){
 	  drone.rc_cmd = &rc_cmd;
 	  drone.state = &state;
 
-	 // ESC_PWM_Calibrate (&htim1, 3000);
+	  //ESC_PWM_Calibrate (&htim1, 3000);
 
 	  drone.calib_state = CALIBRATED;
 	  return HAL_OK;

@@ -7,7 +7,6 @@
 
 #include "Receiver.h"
 #include "utils.h"
-int roll, pitch,yaw;
 extern uint8_t ibus_dma_buffer[IBUS_FRAME_LENGTH];
 void parse_received_data(uint16_t *ibus_data){
 	for (uint8_t channel_index = 0 ,buffer_index = 2; channel_index < IBUS_USER_CHANNELS ; channel_index++, buffer_index+= 2){
@@ -32,7 +31,7 @@ void get_commands(RC_Command_t * rc_cmd){
 	rc_cmd->pitch = (float)(pitch_raw - 1500) / 16.0f;
 	rc_cmd->yaw   = (float)(yaw_raw   - 1500) / 16.0f;
 	rc_cmd->throttle = throttle_raw;
-	//map_raw_to_commands(roll_raw, pitch_raw, throttle_raw, yaw_raw, rc_cmd);
+	map_raw_to_commands(roll_raw, pitch_raw, throttle_raw, yaw_raw, rc_cmd);
 
 	rc_cmd->arm_value = arm_raw > PULSE_MID ? ARMED : DISARMED;
 }
