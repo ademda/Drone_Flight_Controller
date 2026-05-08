@@ -1,0 +1,2 @@
+../app_drivers/Src/sbus_rx.c:20:6:ibus_uart_init	2
+../app_drivers/Src/sbus_rx.c:33:6:ibus_uart_dma_complete_callback	2

@@ -22,7 +22,7 @@
 
 
 /* Low-level driver functions */
-//void ibus_uart_init(UART_HandleTypeDef* huart);
+void ibus_uart_init(UART_HandleTypeDef* huart);
 uint8_t* ibus_get_buffer(void);
 void ibus_uart_dma_complete_callback(void);
 

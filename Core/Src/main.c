@@ -52,7 +52,8 @@ I2C_HandleTypeDef hi2c1;
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 
-UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart6;
+DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
 MPU6050_Handle_t mpu;
@@ -111,11 +112,12 @@ float debug_state_climb_rate = 0.0f;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_USART1_UART_Init(void);
+static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN PFP */
 HAL_StatusTypeDef flight_controller_init();
 
@@ -155,11 +157,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
-  MX_USART1_UART_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Enable UART2 interrupt-based character reception for tuning commands
@@ -480,35 +483,51 @@ static void MX_TIM2_Init(void)
 }
 
 /**
-  * @brief USART1 Initialization Function
+  * @brief USART6 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART1_UART_Init(void)
+static void MX_USART6_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART1_Init 0 */
+  /* USER CODE BEGIN USART6_Init 0 */
 
-  /* USER CODE END USART1_Init 0 */
+  /* USER CODE END USART6_Init 0 */
 
-  /* USER CODE BEGIN USART1_Init 1 */
+  /* USER CODE BEGIN USART6_Init 1 */
 
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART1_Init 2 */
+  /* USER CODE BEGIN USART6_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+  /* USER CODE END USART6_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 
 }
 
@@ -562,12 +581,12 @@ HAL_StatusTypeDef flight_controller_init(){
 	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
 	  MPU6050_Calibrate(&mpu, 1000);
 	  MPU6050_Start_Reading(&mpu);
-    ibus_uart_init(&huart1);
+	  ibus_uart_init(&huart6);
 //	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
 //		  return HAL_ERROR;
 //	  }
 	  //BMP280_Init(&bmp, &hi2c1);
-	  //ESC_PWM_Init(&htim1);
+	  ESC_PWM_Init(&htim1);
 	  /*************************** CONTROL SYSTEM INIT *******************/
 	  pid_init(&roll_pid, &pitch_pid, &yaw_pid, &alt_pid);
 	/********************** DRONE STRUCTURE INIT  ************************/
@@ -584,7 +603,7 @@ HAL_StatusTypeDef flight_controller_init(){
 	  drone.rc_cmd = &rc_cmd;
 	  drone.state = &state;
 
-	  //ESC_PWM_Calibrate (&htim1, 3000);
+	  ESC_PWM_Calibrate (&htim1, 3000);
 
 	  drone.calib_state = CALIBRATED;
 	  return HAL_OK;
