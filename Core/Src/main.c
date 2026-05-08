@@ -53,7 +53,6 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 MPU6050_Handle_t mpu;
@@ -112,12 +111,11 @@ float debug_state_climb_rate = 0.0f;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 HAL_StatusTypeDef flight_controller_init();
 
@@ -157,12 +155,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_I2C1_Init();
-  MX_USART1_UART_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Enable UART2 interrupt-based character reception for tuning commands
@@ -516,22 +513,6 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA2_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA2_Stream2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -581,7 +562,7 @@ HAL_StatusTypeDef flight_controller_init(){
 	  MPU6050_Init(&mpu, &hi2c1, MPU6050_I2C_ADDR_LOW);
 	  MPU6050_Calibrate(&mpu, 1000);
 	  MPU6050_Start_Reading(&mpu);
-      //ibus_uart_init(&huart1);
+    ibus_uart_init(&huart1);
 //	  if (HMC5883L_Init(&hmc, &hi2c1, HMC5883L_I2C_ADDR) != HAL_OK){
 //		  return HAL_ERROR;
 //	  }

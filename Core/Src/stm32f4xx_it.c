@@ -66,7 +66,6 @@ extern BMP280_Handle_t bmp;
 
 /* External variables --------------------------------------------------------*/
 extern I2C_HandleTypeDef hi2c1;
-extern DMA_HandleTypeDef hdma_usart1_rx;
 /* USER CODE BEGIN EV */
 extern Drone_t drone;
 /* USER CODE END EV */
@@ -223,20 +222,6 @@ void I2C1_EV_IRQHandler(void)
   /* USER CODE END I2C1_EV_IRQn 1 */
 }
 
-/**
-  * @brief This function handles DMA2 stream2 global interrupt.
-  */
-void DMA2_Stream2_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA2_Stream2_IRQn 0 */
-
-  /* USER CODE END DMA2_Stream2_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart1_rx);
-  /* USER CODE BEGIN DMA2_Stream2_IRQn 1 */
-
-  /* USER CODE END DMA2_Stream2_IRQn 1 */
-}
-
 /* USER CODE BEGIN 1 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -246,11 +231,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if(huart->Instance == USART1) {
-        ibus_uart_dma_complete_callback();
-    }
-}
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+//    if(huart->Instance == USART1) {
+//        ibus_uart_dma_complete_callback();
+//    }
+//}
 
 // I2C Receive complete callback
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
